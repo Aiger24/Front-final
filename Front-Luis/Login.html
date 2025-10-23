@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="login.css">
+    <title>Login</title>
+</head>
+
+<body>
+    <div class='container'>
+        <div class='left-panel'>
+            <div class='branding'>
+                <h1> Enlace QROO </h1>
+            </div>
+            <div class='hero-text'>
+                <h2> Bienvenido a Enlace QROO, tu plataforma confiable<br>
+                    para la gestión de trámites en línea.</h2>
+                <p> Facilita tus gestiones administrativas con nuestra plataforma segura y eficiente. </p>
+            </div>
+        </div>
+
+
+        <div class='right-panel'>
+            <div class='form-card'>
+                <form id="loginForm" class="login-form" novalidate>
+                    <div class='form-group'>
+                        <h2>Bienvenido</h2>
+
+                        <div class='form-group'>
+                            <label> Ingresa tu usuario</label>
+                            <input type=text placeholder="Usuario" id="username">
+                        </div>
+
+                        <div class='form-group'>
+                            <label for="password"> Ingresa tu contraseña</label>
+                            <div class="password-wrapper">
+                                <input type=password class="password" placeholder="Contraseña" id="password" required>
+
+                                <button type="button" class="toggle-password" aria-label="Mostrar contraseña">
+                                    <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <a href='#' class="helper-link">¿Olvidaste tu contraseña?</a>
+                        </div>
+                        <button type=button class="btn-submit" onclick="login()">Iniciar sesión</button>
+
+                        <button type=button class="btn-secondary" onclick='location.href="Register.html"'> Crear nueva
+                            cuenta </button>
+                    </div>
+                </form>
+            </div>
+            <footer class="form-footer">
+                <p>&copy; 2025 Enlace QROO. Todos los derechos reservados.</p>
+            </footer>
+        </div>
+    </div>
+
+</body>
+
+</html>
