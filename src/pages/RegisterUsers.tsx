@@ -54,20 +54,6 @@ const RegisterUsers: React.FC = () => {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="telefono">Teléfono</label>
-                            <input
-                                type="tel"
-                                id="telefono"
-                                name="telefono"
-                                placeholder="10 dígitos (ej. 9981234567)"
-                                autoComplete="tel"
-                                maxLength={10}
-                                required
-                            >
-                            </input>
-                        </div>
-
-                        <div className="form-group">
                             <label htmlFor="email">Correo Electrónico</label>
                             <input
                                 type="email"
@@ -78,20 +64,6 @@ const RegisterUsers: React.FC = () => {
                                 required
                             >
                             </input>
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="confirmEmail">Confirma tu Correo Electrónico</label>
-                            <input
-                                type="email"
-                                id="confirmEmail"
-                                name="confirmEmail"
-                                placeholder="ejemplo@correo.com"
-                                autoComplete="email"
-                                required
-                            >
-                            </input>
-                            {/*Mensaje de error para correos no coincidentes*/}
                         </div>
 
                         <div className="form-group">
@@ -154,11 +126,13 @@ const RegisterUsers: React.FC = () => {
                             </div>
                             {/*Mensaje de error para contraseñas no coincidentes*/}
                         </div>
-                        
-                        <button type="submit" className="btn-submit">Crear Cuenta</button>
 
-                        <div className="login-link">
-                            ¿Ya tienes cuenta? <a href="Login.tsx" className="helper-link">Iniciar sesión</a>
+                        <div className="actions">
+                            <button type="submit" className="btn-submit">Crear Cuenta</button>
+
+                            <div className="login-link">
+                                ¿Ya tienes cuenta? <a href="Login.tsx" className="helper-link">Iniciar sesión</a>
+                            </div>
                         </div>
 
                     </form>

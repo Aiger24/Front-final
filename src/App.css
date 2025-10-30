@@ -136,7 +136,6 @@ body {
   min-height: 0;
   overflow-y: auto;
   /* quitar el padding superior para que el contenido quede pegado al navbar */
-  padding: 0 2rem 2rem 2rem;
 
   /* eliminar fondo blanco explícito para evitar una franja bajo la navbar */
   background: none;
