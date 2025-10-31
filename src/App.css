@@ -1,8 +1,3 @@
-/* 
-===========================================
-=== CONFIGURACIÓN GLOBAL DEL DOCUMENTO ===
-===========================================
-*/
 * {
   margin: 0;
   padding: 0;
@@ -10,46 +5,38 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+html,
 body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
   background-color: #f9f9f9;
   color: #333;
-  height: 100vh;
-  /* Oculta el scroll horizontal pero deja el scroll vertical disponible */
-  overflow-x: hidden;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Hacer que las barras de scroll no sean visibles pero sigan funcionando */
-/* WebKit (Chrome, Safari, Edge) */
+/* Scrollbars ocultos */
 *::-webkit-scrollbar {
-  width: 0px;
-  height: 0px;
+  width: 0;
+  height: 0;
 }
 
-/* Firefox */
 * {
   scrollbar-width: none;
-  /* escode la barra*/
   -ms-overflow-style: none;
-  /* IE 10+ */
 }
 
-/* 
-======================
-=== CONTENEDOR APP ===
-======================
-*/
-.app {
+.app,
+.main-container,
+.home {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
 }
 
-/*
-======================
-=== NAVBAR NORMAL ===
-======================
-*/
+/* ===== NAVBAR ===== */
 .navbar {
   height: 80px;
   background-color: #611232;
@@ -68,41 +55,13 @@ body {
 .search-bar {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  flex: 1;
-  /* 🔹 Ocupa espacio entre logo y botones */
   justify-content: center;
-  /* 🔹 Centra la barra de búsqueda */
+  flex: 1;
+  gap: 0.75rem;
+  position: relative;
 }
 
-.search-bar input {
-  width: 60%;
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-  border: none;
-  font-size: 1rem;
-  outline: none;
-}
-
-.search-bar button {
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
-  cursor: pointer;
-  font-size: 1.1rem;
-  transition: background-color 0.3s ease;
-}
-
-.search-bar button:hover {
-  background-color: #1565c0;
-}
-
-/* ===============================
-   === BOTONES DE NAVEGACIÓN ===
-   =============================== */
-
+/* === BOTONES DE NAVEGACIÓN === */
 .nav-links {
   list-style: none;
   display: flex;
@@ -126,90 +85,32 @@ body {
   transform: scale(1.05);
 }
 
-/*
-========================================================
-=== ÁREA PRINCIPAL CON MITAD DEL COLOR DE LA NAVBAR ===
-========================================================
-*/
-.scrollable-content {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 2rem;
-
-
-  background: linear-gradient(to bottom,
-
-      #fff 50%,
-      /* a partir de la mitad cambia a blanco */
-      #fff 100%);
-}
-
-/* Scroll personalizado */
-.scrollable-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.scrollable-content::-webkit-scrollbar-thumb {
-  background-color: #d75a00;
-  border-radius: 4px;
-}
-
-/*
-======================
-=== CONTENIDO BASE ===
-======================
-*/
-.home {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  overflow-x: hidden;
-  background-color: #fff;
-}
-
-.about,
-.contact {
-  max-width: 500px;
-  margin: auto;
-  text-align: center;
-  margin-bottom: 3rem;
-  background: rgba(252, 252, 252, 0.85);
-  /* leve transparencia para contraste */
-  padding: 2.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.home h2,
-.about h2,
-.contact h2 {
-  color: #a57f2c;
-}
-
+/* ===== CHAT ===== */
 .chat-section {
   display: flex;
   justify-content: center;
+  align-items: center;
   padding: 2rem 1rem 5rem;
-
 }
 
 .chat-app {
   background-color: #611232;
-  width: 90%;
+  width: 100%;
   max-width: 900px;
-  border-radius: 20px;
+  height: 500px;
+  border-radius: 15px;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-/* Encabezado */
 .chat-header {
   background-color: #611232;
-  color: white;
-  padding: 1rem 1.2rem;
+  color: #fff;
+  padding: 0.9rem 1.2rem;
+  font-weight: 600;
+  font-size: 1.1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -231,7 +132,6 @@ body {
 }
 
 .chat-info h3 {
-  margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
 }
@@ -241,20 +141,18 @@ body {
   opacity: 0.9;
 }
 
-
-/* Área de mensajes */
+/* === Mensajes === */
 .chat-messages {
   flex: 1;
-  height: 430px;
   overflow-y: auto;
-  padding: 1.2rem;
-  background: #f8f8fa;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  background-color: #fafafa;
+  scroll-behavior: smooth;
 }
 
-/* Burbujas de mensaje */
 .message {
   display: flex;
   align-items: flex-end;
@@ -297,129 +195,187 @@ body {
   border-bottom-right-radius: 4px;
 }
 
-/* Área de entrada de texto */
+/* === Input de mensaje === */
+
+
+/* === Input de mensaje (DISEÑO RESTAURADO) === */
 .chat-input-area {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
   padding: 0.8rem 1rem;
-  border-top: 1px solid #ddd;
   background-color: #fff;
+  border-top: 1px solid #ddd;
+  gap: 0.8rem;
 }
 
-.chat-input-area input {
+.chat-input-area input[type="text"] {
   flex: 1;
-  padding: 0.8rem 1rem;
-  border-radius: 20px;
-  border: 1.8px solid #ccc;
-  outline: none;
+  padding: 0.9rem 1.2rem;
+  border: none;
+  border-radius: 25px;
+  background-color: #f4f4f4;
   font-size: 1rem;
+  color: #333;
+  outline: none;
   transition: all 0.3s ease;
 }
 
-.chat-input-area input:focus {
-  border-color: #611232;
-  box-shadow: 0 0 6px rgba(97, 18, 50, 0.3);
+.chat-input-area input[type="text"]:focus {
+  background-color: #fff;
+  box-shadow: 0 0 0 2px #61123233;
 }
 
-.send-btn {
-  background: #611232;
-  color: white;
+.chat-input-area input[type="text"]::placeholder {
+  color: #888;
+}
+
+.chat-input-area button {
+  background-color: #611232;
   border: none;
-  border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.2rem;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.9rem 1.4rem;
+  border-radius: 25px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s ease;
 }
 
-.send-btn:hover {
-  background: #8b1945;
-  transform: scale(1.08);
+.chat-input-area button:hover {
+  background-color: #7a183b;
+  transform: scale(1.05);
 }
 
-/* Scroll */
-.chat-messages::-webkit-scrollbar {
-  width: 6px;
-}
 
-.chat-messages::-webkit-scrollbar-thumb {
-  background: #c9a3b1;
-  border-radius: 10px;
-}
-
-/* ======== SECCIÓN DE APOYOS ======== */
+/* ===== SECCIÓN DE APOYOS ===== */
 .info-section {
-  background: #ffffff;
-  padding: 4rem 2rem;
+  background: #fff;
+  padding: 3rem 2rem;
   text-align: center;
 }
 
 .main-subtitle {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.8rem;
   color: #611232;
   margin-bottom: 2rem;
 }
 
 .info-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.8rem;
-  max-width: 1000px;
-  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  transition: all 0.3s ease-in-out;
 }
 
 .info-card {
-  background: #faf4f6;
-  border-radius: 14px;
-  box-shadow: 0 4px 10px rgba(97, 18, 50, 0.1);
-  padding: 1.2rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  transition: 0.3s;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 280px;
+  padding: 1.4rem;
+  text-align: center;
+  cursor: pointer;
+  transform: scale(1);
+  transition: all 0.4s ease;
+  position: relative;
+  flex-shrink: 0;
 }
 
 .info-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 20px rgba(97, 18, 50, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.info-card img {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.info-card:hover img {
+  transform: scale(1.08);
+}
+
+/* Estado expandido */
+.info-card.expandido {
+  position: relative;
+  z-index: 10;
+  transform: scale(1.15);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(135deg, #fff, #f7f0f2);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+.info-card.oculto {
+  opacity: 0;
+  transform: scale(0.9);
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.info-card.expandido img {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 1rem;
+  transition: all 0.4s ease;
 }
 
 .card-content h4 {
-  margin: 0;
   color: #611232;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
 }
 
 .card-content p {
-  color: #333;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  color: #444;
   line-height: 1.4;
 }
 
-/*
-======================
-=== PIE DE PÁGINA ===
-======================
-*/
-.footer {
-  text-align: center;
-  background-color: #611232;
-  color: white;
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-  padding: 2.5rem 0 2.5rem 0;
-  font-size: 1.2rem;
-  /* Elimina cualquier posición fija/pegada */
+.detalles {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.5;
 }
 
-/* Agregar espacio en el contenido principal para evitar que el footer fijo lo oculte */
-.home {
-  padding-bottom: calc(1rem + 40px);
-  /* Padding extra para el footer fijo */
+.volver-btn {
+  background-color: #611232;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  margin-top: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.volver-btn:hover {
+  background-color: #7a183b;
+  transform: scale(1.05);
+}
+
+/* ===== FOOTER (CORREGIDO) ===== */
+.footer {
+  text-align: center;
+  background: linear-gradient(135deg, #611232, #7a183b);
+  color: #fff;
+  padding: 2.5rem 1rem;
+  font-size: 1rem;
+  width: 100%;
+  border-top: 4px solid #a57f2c;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  margin-top: auto;
+  position: relative;
+  bottom: 0;
+  left: 0;
+}
+
+body>*:last-child {
+  margin-bottom: 0;
 }

@@ -3,7 +3,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import About from "./pages/Login";
-import Contact from "./pages/Record";
+import Contact from "./pages/Register";
 import "./App.css";
 
 function App() {
