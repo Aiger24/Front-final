@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import "../login.css";
+import Login from "./Login";
 
 
 const RegisterUsers: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
     return (
         <div className="container">
@@ -131,7 +133,7 @@ const RegisterUsers: React.FC = () => {
                             <button type="submit" className="btn-submit">Crear Cuenta</button>
 
                             <div className="login-link">
-                                ¿Ya tienes cuenta? <a href="Login.tsx" className="helper-link">Iniciar sesión</a>
+                                ¿Ya tienes cuenta? <a href="/Login.tsx" className="helper-link">Iniciar sesión</a>
                             </div>
                         </div>
 
