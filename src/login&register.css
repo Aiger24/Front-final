@@ -28,16 +28,35 @@ body {
     min-height: 100vh;
 }
 
-/* Left Panel - Branding */
+/* Panel izquierdo */
 .left-panel {
     background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
     color: var(--white);
     padding: 60px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     position: relative;
     overflow: hidden;
+}
+
+/* Logo Qroo de fondo */
+.logo-qroo {
+    position: absolute;
+    width: 120%;
+    height: 120%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.12;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.logo-qroo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .left-panel::before {
@@ -47,33 +66,99 @@ body {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
     animation: pulse 15s ease-in-out infinite;
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.3; }
-    50% { transform: scale(1.1); opacity: 0.5; }
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.5;
+    }
 }
 
 .branding {
-    position: relative;
-    z-index: 1;
+    position: absolute;
+    top: 20px;
+    left: 40px;
+    z-index: 2;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    margin: 0;
 }
 
 
+
+/* Estilos para el botón de branding (logo + texto clickable) */
+.branding-btn {
+    position: absolute;
+    top: 20px;
+    left: 40px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--white);
+    font-size: 18px;
+}
+
+.branding-btn:focus {
+    outline: 3px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+}
+
+.branding-btn .branding-logo {
+    width: 90px;
+    height: auto;
+}
+
+.branding-btn h1 {
+    color: var(--white);
+}
+
+
+
+.hero-text {
+    z-index: 2;
+    align-items: center;
+}
+
 .hero-text h2 {
-    font-size: 42px;
+    font-size: 30px;
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 20px;
+    z-index: 2;
 }
 
 .hero-text p {
-    font-size: 16px;
+    font-size: 22px;
     line-height: 1.6;
     opacity: 0.95;
     max-width: 480px;
+    z-index: 2;
+}
+
+.divider-line {
+    width: 90px;
+    height: 4px;
+    background-color: var(--white);
+    margin: 20px auto;
+    border-radius: 2px;
 }
 
 /* Right Panel - Form */
@@ -87,7 +172,8 @@ body {
     position: relative;
 }
 
-.form-card { /* tarjeta del formulario */
+.form-card {
+    /* tarjeta del formulario */
     background: var(--white);
     border-radius: 20px;
     padding: 48px;
@@ -97,12 +183,12 @@ body {
     animation: slideInUp 0.6s ease;
 }
 
-/*investigar como se usa*/
 @keyframes slideInUp {
     from {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -119,7 +205,8 @@ body {
 .actions {
     display: flex;
     flex-direction: column;
-    gap: 14px; /* espacio vertical entre los botones */
+    gap: 14px;
+    /* espacio vertical entre los botones */
     margin-top: 8px;
 }
 
@@ -191,7 +278,7 @@ body {
 }
 
 .helper-link {
-   
+
     color: var(--primary);
     text-decoration: none;
     align-self: flex-start;
@@ -258,20 +345,34 @@ body {
 
 /* FORMULARIO DE REGISTRO */
 
+.Text-hero {
+    z-index: 2;
+    color: var(--white);
+    text-align: center;
+}
+
 .Text-hero h2 {
     font-size: 42px;
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 20px;
+    text-align: center;
+}
+
+.Text-hero p {
+    font-size: 23px;
+    line-height: 1.7;
+    opacity: 0.95;
+    animation: fadeInUp 0.8s ease-out 0.4s both;
 }
 
 .register-card {
     max-width: 560px;
 }
 
-.form-row{
+.form-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+
     gap: 16px;
 }
 
@@ -302,5 +403,9 @@ li {
     width: 100%;
 }
 
-
-
+/* Cuando queremos que el contenido ocupe toda la pantalla (sin navbar) */
+.scrollable-content.full-screen {
+    min-height: 100vh;
+    padding-top: 0;
+    /* elimina espacio superior dejado por la navbar */
+}

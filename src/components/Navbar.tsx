@@ -1,10 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
-type NavbarProps = {
-  setPage: React.Dispatch<React.SetStateAction<"home" | "about" | "contact">>;
-};
-
-function Navbar({ setPage }: NavbarProps) {
+function Navbar() {
   const [search, setSearch] = useState("");
   return (
     <nav className="navbar">
@@ -25,9 +22,9 @@ function Navbar({ setPage }: NavbarProps) {
 
       {/* Menú de navegación */}
       <ul className="nav-links">
-        <li onClick={() => setPage("home")}>Inicio</li>
-        <li onClick={() => setPage("about")}>Iniciar sesión</li>
-        <li onClick={() => setPage("contact")}>Registro</li>
+        <li><Link to="/">Inicio</Link></li>
+        <li><Link to="/login">Iniciar sesión</Link></li>
+        <li><Link to="/register">Registro</Link></li>
       </ul>
     </nav>
   );

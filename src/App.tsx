@@ -1,26 +1,29 @@
-import { useState } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
-import About from "./pages/Login";
-import Contact from "./pages/RegisterUsers";
+import Login from "./pages/Login";
+import RegisterUsers from "./pages/RegisterUsers";
+import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 import "./App.css";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 function App() {
-  // Estado para controlar la página actual
-  const [page, setPage] = useState<"home" | "about" | "contact">("home");
+  const location = useLocation();
+  const hideNavbar = location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/forgot" || location.pathname === "/reset-password";
 
   return (
-    // Contenedor general de la aplicación
     <div className="app">
-      {/* Navbar ocupa la mitad superior */}
-      <Navbar setPage={setPage} />
+      {!hideNavbar && <Navbar />}
 
-      {/* Contenido principal que puede desplazarse */}
-      <div className="scrollable-content">
-        {page === "home" && <Home />}
-        {page === "about" && <About />}
-        {page === "contact" && <Contact />}
+      <div className={`scrollable-content ${hideNavbar ? "full-screen" : ""}`}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<RegisterUsers />} />
+          <Route path="/forgot" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+        </Routes>
         <Footer />
       </div>
     </div>

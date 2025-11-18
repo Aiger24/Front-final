@@ -1,6 +1,9 @@
 import React from "react";
 import { useLoginForm } from "../hooks/useLoginForm";
-import "../login.css";
+import "../login&register.css";
+import logoGob from "../img/logoGob.png";
+import logoicon from "../img/logoicon.png";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [
@@ -11,21 +14,32 @@ const Login: React.FC = () => {
 
     { setUsername,
       setPassword,
+      togglePassword,
       handleSubmit }
 
   ] = useLoginForm();
+  const navigate = useNavigate();
 
   return (
     <div className="container login-page">
       <div className="left-panel">
-        <div className="branding">
-          <h1>Enlace QROO</h1>
+        <div className="logo-qroo">
+          <img src={logoGob} alt="Logo Gobierno de Qroo" />
         </div>
+        <button
+          className="branding-btn"
+          type="button"
+          onClick={() => navigate('/')}
+          aria-label="Ir a inicio"
+        >
+          <img src={logoicon} alt="Enlace Qroo logo" className="branding-logo" />
+          <h1>Regresar a Enlace QROO</h1>
+        </button>
         <div className="hero-text">
           <h2>
-            Bienvenido a Enlace QROO, tu plataforma confiable
-            <br /> para la gestión de trámites en línea.
+            Bienvenido a Enlace QROO, tu plataforma confiable para la gestión de trámites en línea.
           </h2>
+          <div className="divider-line"></div>
           <p>Facilita tus gestiones administrativas con nuestra plataforma segura y eficiente.</p>
         </div>
       </div>
@@ -37,10 +51,10 @@ const Login: React.FC = () => {
               <h2>Bienvenido</h2>
 
               <div className="form-group">
-                <label htmlFor="username">Ingresa tu Correo </label>
+                <label htmlFor="username">Ingresa tu Correo o Nombre de usuario</label>
                 <input
                   type="text"
-                  placeholder="Correo"
+                  placeholder="Correo o Nombre de usuario"
                   id="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -62,7 +76,7 @@ const Login: React.FC = () => {
                   <button
                     type="button"
                     className="toggle-password"
-                    data-target="password"
+                    onClick={togglePassword}
                     aria-label="Mostrar contraseña"
                   >
                     <svg className="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -72,9 +86,9 @@ const Login: React.FC = () => {
                   </button>
                 </div>
 
-                <a href="#" className="helper-link">
+                <button type="button" className="helper-link" onClick={() => navigate('/forgot')}>
                   ¿Olvidaste tu contraseña?
-                </a>
+                </button>
               </div>
 
               {error && <div className="form-error">{error}</div>}
@@ -87,7 +101,7 @@ const Login: React.FC = () => {
                 <button
                   type="button"
                   className="btn-secondary"
-                  onClick={() => (window.location.href = "/Front-Luis/Register.html")}
+                  onClick={() => navigate('/register')}
                 >
                   Crear nueva cuenta
                 </button>
