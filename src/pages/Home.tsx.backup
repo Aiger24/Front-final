@@ -1,0 +1,429 @@
+﻿import { useState, useRef, useEffect } from "react";
+import beca_benito_juarez from "../assets/beca_benito_juarez.jpg";
+import adultos_mayores from "../assets/adultos_mayores.jpg";
+import jovenes_futuro from "../assets/jovenes_futuro.jpg";
+import madres_trabajadoras from "../assets/madres_trabajadoras.jpg";
+import sembrando_vida from "../assets/sembrando_vida.jpg";
+import ChatHistory from "../components/chathistory";
+
+
+interface Message {
+  sender: "bot" | "user";
+  text: string;
+}
+
+interface Apoyo {
+  titulo: string;
+  descripcion: string;
+  detalles: string;
+  img: string;
+}
+
+function Home() {
+  const [messages, setMessages] = useState<Message[]>([
+    { sender: "bot", text: "ðŸ‘‹ Â¡Hola! Soy EnlaceBot. Â¿En quÃ© puedo ayudarte hoy?" },
+  ]);
+  const [inputValue, setInputValue] = useState("");
+  const [showApoyos, setShowApoyos] = useState(false);
+  const [tarjetaSeleccionada, setTarjetaSeleccionada] = useState<number | null>(null);
+  const [busqueda, setBusqueda] = useState("");
+
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const subtituloRef = useRef<HTMLHeadingElement | null>(null);
+
+
+
+  useEffect(() => {
+    const chatContainer = messagesEndRef.current?.parentElement;
+    if (!chatContainer) return;
+
+    const shouldScroll =
+      chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 150;
+
+    if (shouldScroll) {
+      chatContainer.scrollTo({
+        top: chatContainer.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [messages]);
+
+  // ðŸ”§ Mantener el panel de apoyos fijo junto al chatbot
+
+  const handleSend = () => {
+    if (!inputValue.trim()) return;
+
+    const nuevoMensaje: Message = { sender: "user", text: inputValue };
+    setMessages((prev) => [...prev, nuevoMensaje]);
+    setInputValue("");
+
+
+
+    // ðŸ”½ Desplazar el chat hacia abajo manualmente
+    const chatContainer = messagesEndRef.current?.parentElement;
+    if (chatContainer) {
+      chatContainer.scrollTo({
+        top: chatContainer.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "Gracias por tu mensaje ðŸ˜Š pronto te responderÃ© con la informaciÃ³n que necesitas.",
+        },
+      ]);
+    }, 800);
+  };
+
+
+  const apoyos: Apoyo[] = [
+    {
+      titulo: "Beca Benito JuÃ¡rez",
+      descripcion: "Apoyo econÃ³mico para estudiantes de educaciÃ³n bÃ¡sica, media y superior.",
+      detalles:
+        "Este programa brinda becas bimestrales a estudiantes de bajos recursos. Busca fomentar la permanencia escolar.",
+      img: beca_benito_juarez,
+    },
+    {
+      titulo: "PensiÃ³n Adultos Mayores",
+      descripcion: "Programa de apoyo bimestral para personas mayores de 65 aÃ±os.",
+      detalles:
+        "Ofrece apoyo directo a adultos mayores, garantizando su bienestar social y econÃ³mico.",
+      img: adultos_mayores,
+    },
+    {
+      titulo: "JÃ³venes Construyendo el Futuro",
+      descripcion: "CapacitaciÃ³n y apoyo econÃ³mico para jÃ³venes sin empleo ni estudios.",
+      detalles:
+        "Capacita a jÃ³venes en empresas o instituciones durante un aÃ±o con apoyo econÃ³mico y seguro mÃ©dico.",
+      img: jovenes_futuro,
+    },
+    {
+      titulo: "Apoyo a Madres Trabajadoras",
+      descripcion: "Ayuda econÃ³mica para madres que trabajan y no cuentan con guarderÃ­a.",
+      detalles:
+        "Proporciona recursos mensuales para el cuidado infantil y fomenta la participaciÃ³n laboral femenina.",
+      img: madres_trabajadoras,
+    },
+    {
+      titulo: "Sembrando Vida",
+      descripcion: "Apoyo a campesinos para el cultivo sostenible y recuperaciÃ³n forestal.",
+      detalles:
+        "Promueve el desarrollo rural sustentable mediante prÃ¡cticas agroforestales y producciÃ³n ecolÃ³gica.",
+      img: sembrando_vida,
+    },
+  ];
+
+  const apoyosFiltrados = apoyos.filter((a) =>
+    a.titulo.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
+  const toggleApoyos = () => {
+    setShowApoyos(!showApoyos);
+  };
+
+  const handleEnviarApoyo = (nombre: string) => {
+    alert(`Has seleccionado el apoyo: ${nombre}`);
+    // AquÃ­ podrÃ­as enviar el texto al chatbot automÃ¡ticamente si tienes esa funciÃ³n integrada.
+  };
+
+  const handleSelectHistoryMessage = (text: string) => {
+    // Agregar el mensaje del historial al chat como si el usuario lo hubiera escrito
+    const nuevoMensaje: Message = { sender: "user", text };
+    setMessages((prev) => [...prev, nuevoMensaje]);
+
+    // Simular respuesta del bot
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "He encontrado la informaciÃ³n sobre eso. Â¿Necesitas mÃ¡s detalles?",
+        },
+      ]);
+    }, 800);
+  };
+
+  return (
+    <main className="home">
+
+      {/* === Chat Section === */}
+      <section className="chat-section">
+        <div className="chat-app">
+          <div className="chat-header">
+            <div className="chat-header-left">
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/4712/4712105.png"
+                alt="EnlaceBot"
+                className="chat-avatar"
+              />
+              <div className="chat-info">
+                <h3>EnlaceBot</h3>
+                <span className="status">Disponible para ayudarte</span>
+              </div>
+            </div>
+
+
+            <ChatHistory
+              messages={messages}
+              onSelectMessage={handleSelectHistoryMessage}
+            />
+
+
+          </div>
+
+          {/* Barra de Apoyos */}
+          <div className="apoyos-bar">
+            <button className="apoyos-toggle" onClick={toggleApoyos}>
+              ðŸ“‘ Apoyos {showApoyos ? "â–²" : "â–¼"}
+            </button>
+
+            <div className={`apoyos-panel ${showApoyos ? "open" : ""}`}>
+              <input
+                type="text"
+                className="apoyos-search"
+                placeholder="Buscar apoyo..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+
+              <div className="apoyos-list">
+                {apoyosFiltrados.map((apoyo, index) => (
+                  <div
+                    key={index}
+                    className="apoyo-item"
+                    onClick={() => handleEnviarApoyo(apoyo.titulo)}
+                  >
+                    <h4>{apoyo.titulo}</h4>
+                    <p>{apoyo.descripcion}</p>
+                    <button className="enviar-chat">Enviar al chat</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+
+          <div className="chat-messages">
+            {messages.map((msg, i) => (
+              <div key={i} className={`message ${msg.sender}`}>
+                {msg.sender === "bot" && (
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/4712/4712105.png"
+                    alt="Bot"
+                    className="msg-avatar"
+                  />
+                )}
+                <p className="bubble">{msg.text}</p>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+
+
+          <div
+            className="chat-input-area"
+
+          >
+            <input
+              type="text"
+              placeholder="Escribe tu mensaje..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+            />
+            <button
+              type="button"
+              className="send-btn"
+              onClick={handleSend}
+              aria-label="Enviar mensaje"
+            >
+              âž¤
+            </button>
+          </div>
+
+
+        </div>
+      </section>
+
+
+      {/* === Apoyos Section === */}
+      <section className="info-section">
+        <h3 ref={subtituloRef} className="main-subtitle">
+          Apoyos mÃ¡s solicitados
+        </h3>
+        <div className="info-cards">
+          {apoyos.map((apoyo, index) => (
+            <ApoyoCard
+              key={index}
+              apoyo={apoyo}
+              activo={tarjetaSeleccionada === index}
+              oculto={tarjetaSeleccionada !== null && tarjetaSeleccionada !== index}
+              onExpand={() => setTarjetaSeleccionada(index)}
+              onClose={() => setTarjetaSeleccionada(null)}
+              subtituloRef={subtituloRef} // ðŸ‘ˆ pasamos el ref a la card
+            />
+          ))}
+        </div>
+
+
+      </section>
+
+      <GuiaEnlaceQroo />
+
+    </main>
+  );
+}
+
+// === GuÃ­a de uso de Enlace Qroo ===
+function GuiaEnlaceQroo() {
+  return (
+    <section className="guia-uso">
+      <h3 className="guia-titulo"> GuÃ­a para usar Enlace Qroo</h3>
+      <p className="guia-intro">
+        Tu espacio para encontrar apoyos, becas y programas del gobierno fÃ¡cilmente.
+      </p>
+
+      <div className="guia-pasos">
+        <div className="guia-card">
+          <h4>1. CÃ³mo empezar</h4>
+          <p>
+            Escribe tu pregunta en el chat, por ejemplo:
+            <br />â€¢ â€œApoyos para madres solterasâ€
+            <br />â€¢ â€œÂ¿CÃ³mo solicitar la beca Benito JuÃ¡rez?â€
+            <br />â€¢ â€œAyuda para adultos mayoresâ€
+          </p>
+          <p>Presiona el botÃ³n <strong>âž¤ Enviar</strong> o la tecla <strong>Enter</strong>.</p>
+        </div>
+
+        <div className="guia-card">
+          <h4>2. Usa el botÃ³n de Apoyos</h4>
+          <p>
+            En la parte superior del chat verÃ¡s el botÃ³n <strong>â€œApoyosâ€</strong>.
+            <br />Haz clic para ver una lista de apoyos disponibles.
+            <br />Selecciona el que te interese y envÃ­alo al chat con un solo clic.
+          </p>
+        </div>
+
+        <div className="guia-card">
+          <h4>3. Buscar apoyos especÃ­ficos</h4>
+          <p>
+            Escribe palabras simples como:
+            <br />â€œBecaâ€, â€œAdultos mayoresâ€, â€œCampoâ€, â€œEmpleoâ€ o â€œSaludâ€.
+            <br />El chatbot te mostrarÃ¡ los programas relacionados.
+          </p>
+        </div>
+
+        <div className="guia-card">
+          <h4>4. Consejos para una mejor experiencia</h4>
+          <ul>
+            <li> No te preocupes por escribir perfecto, el bot te entiende.</li>
+            <li> Si no entiendes algo, escribe â€œExplÃ­calo mÃ¡s fÃ¡cilâ€.</li>
+            <li> Puedes usar Enlace Qroo en celular, tableta o computadora.</li>
+            <li> No es obligatorio registrarse.</li>
+          </ul>
+        </div>
+
+        <div className="guia-card">
+          <h4>5. Seguridad y confianza</h4>
+          <p>
+            Enlace Qroo no solicita datos personales.
+            <br />Solo ofrece informaciÃ³n pÃºblica y verificada de fuentes oficiales.
+          </p>
+        </div>
+
+        <div className="guia-card guia-final">
+          <p className="guia-consejo">
+            <strong>Consejo del EnlaceBot:</strong> â€œNo tengas miedo de preguntar.
+            Estoy aquÃ­ para ayudarte a encontrar el apoyo que mereces.â€
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+interface ApoyoCardProps {
+  apoyo: Apoyo;
+  activo: boolean;
+  oculto: boolean;
+  onExpand: () => void;
+  onClose: () => void;
+  subtituloRef: React.RefObject<HTMLHeadingElement>;
+}
+
+function ApoyoCard({ apoyo, activo, oculto, onExpand, onClose, subtituloRef }: ApoyoCardProps) {
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const [volviendo, setVolviendo] = useState(false);
+
+  useEffect(() => {
+    if (activo && cardRef.current && subtituloRef.current) {
+      // PosiciÃ³n absoluta de la card dentro del documento
+      const cardHeight = cardRef.current.offsetHeight;
+
+      // PosiciÃ³n absoluta del subtÃ­tulo dentro del documento
+      const subtituloBottom = subtituloRef.current.offsetTop + subtituloRef.current.offsetHeight;
+
+      // Calcula scroll para que la card quede centrada debajo del subtÃ­tulo
+      const scrollY = subtituloBottom + cardHeight / 2 - window.innerHeight / 2;
+
+      window.scrollTo({
+        top: scrollY,
+        behavior: "smooth",
+      });
+    }
+  }, [activo]);
+
+
+
+
+  const handleClose = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setVolviendo(true);
+    setTimeout(() => {
+      setVolviendo(false);
+      onClose();
+    }, 500); // coincide con duraciÃ³n de animaciÃ³n CSS
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      className={`info-card 
+        ${activo ? "expandido" : ""} 
+        ${oculto ? "oculto" : ""} 
+        ${volviendo ? "volviendo" : ""}`}
+      onClick={!activo ? onExpand : undefined}
+    >
+      <img src={apoyo.img} alt={apoyo.titulo} />
+      <div className="card-content">
+        <h4>{apoyo.titulo}</h4>
+        <p>{apoyo.descripcion}</p>
+
+        {activo && (
+          <>
+            <p className="detalles">{apoyo.detalles}</p>
+            <button className="volver-btn" onClick={handleClose}>
+              Volver
+            </button>
+          </>
+        )}
+
+      </div>
+
+
+
+    </div>
+  );
+}
+
+export default Home;
