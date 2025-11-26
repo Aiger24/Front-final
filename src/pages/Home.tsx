@@ -1,5 +1,5 @@
 ﻿import { useState, useRef, useEffect } from "react";
-import { FaMicrophone, FaArrowUp } from "react-icons/fa";
+import { FaMicrophone, FaArrowUp, FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { RiSendPlaneFill } from "react-icons/ri";
 import beca_benito_juarez from "../assets/beca_benito_juarez.jpg";
 import adultos_mayores from "../assets/adultos_mayores.jpg";
@@ -38,8 +38,10 @@ function Home() {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const subtituloRef = useRef<HTMLHeadingElement | null>(null);
   const apoyosPanelRef = useRef<HTMLDivElement | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
+
+  // 🔧 Botón de scroll to top
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -246,7 +248,7 @@ function Home() {
               onClick={toggleApoyos}
               aria-label="Alternar panel de apoyos"
             >
-              📑 Apoyos {showApoyos ? "▲" : "▼"}
+              📑 Apoyos {showApoyos ? <FaChevronUp className="show-list" /> : <FaChevronDown className="show-list" />}
             </button>
 
             <div className={`apoyos-panel ${showApoyos ? "open" : ""}`} ref={apoyosPanelRef}>
@@ -447,7 +449,7 @@ function GuiaEnlaceQroo() {
         </div>
 
         <div className="guia-card">
-          <h4>3. Buscar apoyos específicos</h4>
+          <h4 className = "Titulo">3. Buscar apoyos específicos</h4>
           <p>
             Escribe palabras simples como:
             <br />📖 “Beca” | 👴👵 “Adultos mayores” | 🌾 “Campo” | 💼 “Empleo” | 🏥 “Salud”.
