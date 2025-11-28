@@ -9,7 +9,6 @@ function Navbar() {
 
       {/* Menú de navegación */}
       <ul className="nav-links">
-        <li><Link to="/">Inicio</Link></li>
         <li><Link to="/login">Iniciar sesión</Link></li>
         <li><Link to="/register">Registro</Link></li>
       </ul>
