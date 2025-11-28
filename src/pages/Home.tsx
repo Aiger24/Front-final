@@ -9,7 +9,7 @@ import sembrando_vida from "../assets/sembrando_vida.jpg";
 import ChatHistory from "../components/chathistory";
 import Enlacebot from "../assets/Enlacebot.jpg";
 import { sendChatMessage } from "../services/chatClient";
-
+import { formatMarkdown } from "./formatMarkdown";
 
 interface Message {
   sender: "bot" | "user";
@@ -39,7 +39,6 @@ function Home() {
   const subtituloRef = useRef<HTMLHeadingElement | null>(null);
   const apoyosPanelRef = useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = useState(true);
-
 
   // 🔧 Botón de scroll to top
   const scrollToTop = () => {
@@ -76,6 +75,32 @@ function Home() {
     }
   }, [messages]);
 
+
+    // Función para enviar mensajes al backend - CORREGIDA
+  const sendChatMessage = async (message: string) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          message: message,
+          type: "text"
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error sending message:', error);
+      throw error;
+    }
+  };
   // 🔧 Mantener el panel de apoyos fijo junto al chatbot
 
   const handleSend = () => {
@@ -93,13 +118,25 @@ function Home() {
     setError(null);
     setMessages((prev) => [...prev, { sender: "user", text: cleanPrompt }]);
 
-    try {
+        try {
       const data = await sendChatMessage(cleanPrompt);
-      if (data?.answer) {
-        const botText = data.answer;
-        setMessages((prev) => [...prev, { sender: "bot", text: botText }]);
+      
+      // DEBUG: Mostrar toda la respuesta del backend
+      console.log("Respuesta completa del backend:", data);
+      
+      // CORREGIDO: Usar 'Message' en lugar de 'answer'
+      if (data?.Message) {
+        const botText = data.Message;
+        const formattedText = formatMarkdown(botText);
+        setMessages((prev) => [...prev, { sender: "bot", text: formattedText }]);
+      } else if (data?.message) {
+        // Por si acaso el backend usa 'message' en minúscula
+        const botText = data.message;
+        const formattedText = formatMarkdown(botText);
+        setMessages((prev) => [...prev, { sender: "bot", text: formattedText }]);
       } else {
-        setError("El backend no envió ninguna respuesta.");
+        console.error("Estructura de respuesta inesperada:", data);
+        setError("El backend no envió ninguna respuesta válida.");
       }
     } catch (err) {
       console.error(err);
@@ -108,7 +145,6 @@ function Home() {
       setIsBotTyping(false);
     }
   };
-
 
   const apoyos: Apoyo[] = [
     {
@@ -167,7 +203,6 @@ function Home() {
       }
     }
   };
-
 
   const handleEnviarApoyo = (nombre: string) => {
     setApoyoError(null);
@@ -231,7 +266,6 @@ function Home() {
                 ¿Cómo usar Enlace Qroo?
               </button>
             </div>
-
 
             <ChatHistory
               messages={messages}
@@ -319,7 +353,10 @@ function Home() {
                     className="msg-avatar"
                   />
                 )}
-                <p className="bubble">{msg.text}</p>
+                <p 
+                  className="bubble"
+                  dangerouslySetInnerHTML={{ __html: msg.text }}
+                />
               </div>
             ))}
             {isBotTyping && (
@@ -331,11 +368,7 @@ function Home() {
             <div ref={messagesEndRef} />
           </div>
 
-
-          <div
-            className="chat-input-area"
-
-          >
+          <div className="chat-input-area">
             <input
               type="text"
               placeholder="Escribe tu mensaje..."
@@ -371,11 +404,8 @@ function Home() {
               {error}
             </p>
           )}
-
-
         </div>
       </section>
-
 
       {/* === Apoyos Section === */}
       <section className="info-section">
@@ -411,11 +441,9 @@ function Home() {
           <FaArrowUp />
         </button>
       )}
-
     </main>
   );
 }
-
 
 // === Guía de uso de Enlace Qroo ===
 function GuiaEnlaceQroo() {
@@ -603,7 +631,6 @@ function ApoyoCard({ apoyo, activo, oculto, onExpand, onClose, subtituloRef, onP
             </div>
           </>
         )}
-
       </div>
     </div>
   );
