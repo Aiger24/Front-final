@@ -1,4 +1,6 @@
 ﻿import { useState, useRef, useEffect } from "react";
+import { FaMicrophone, FaArrowUp, FaChevronUp, FaChevronDown } from "react-icons/fa";
+import { RiSendPlaneFill } from "react-icons/ri";
 import beca_benito_juarez from "../assets/beca_benito_juarez.jpg";
 import adultos_mayores from "../assets/adultos_mayores.jpg";
 import jovenes_futuro from "../assets/jovenes_futuro.jpg";
@@ -6,6 +8,7 @@ import madres_trabajadoras from "../assets/madres_trabajadoras.jpg";
 import sembrando_vida from "../assets/sembrando_vida.jpg";
 import ChatHistory from "../components/chathistory";
 import Enlacebot from "../assets/Enlacebot.jpg";
+import { sendChatMessage } from "../services/chatClient";
 
 
 interface Message {
@@ -29,12 +32,34 @@ function Home() {
   const [tarjetaSeleccionada, setTarjetaSeleccionada] = useState<number | null>(null);
   const [busqueda, setBusqueda] = useState("");
   const [apoyoError, setApoyoError] = useState<string | null>(null);
+  const [isBotTyping, setIsBotTyping] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const subtituloRef = useRef<HTMLHeadingElement | null>(null);
   const apoyosPanelRef = useRef<HTMLDivElement | null>(null);
+  const [isVisible, setIsVisible] = useState(true);
 
 
+  // 🔧 Botón de scroll to top
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  useEffect(() => {
+    const toggleVisibility = () => {
+      if (window.scrollY > 300) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener("scroll", toggleVisibility);
+
+    return () => {
+      window.removeEventListener("scroll", toggleVisibility);
+    };
+  }, []);
 
   useEffect(() => {
     const chatContainer = messagesEndRef.current?.parentElement;
@@ -54,32 +79,34 @@ function Home() {
   // 🔧 Mantener el panel de apoyos fijo junto al chatbot
 
   const handleSend = () => {
-    if (!inputValue.trim()) return;
-
-    const nuevoMensaje: Message = { sender: "user", text: inputValue };
-    setMessages((prev) => [...prev, nuevoMensaje]);
+    const prompt = inputValue.trim();
+    if (!prompt) return;
     setInputValue("");
+    handleAIResponse(prompt);
+  };
 
+  const handleAIResponse = async (prompt: string) => {
+    const cleanPrompt = prompt.trim();
+    if (!cleanPrompt) return;
 
+    setIsBotTyping(true);
+    setError(null);
+    setMessages((prev) => [...prev, { sender: "user", text: cleanPrompt }]);
 
-    // 🔽 Desplazar el chat hacia abajo manualmente
-    const chatContainer = messagesEndRef.current?.parentElement;
-    if (chatContainer) {
-      chatContainer.scrollTo({
-        top: chatContainer.scrollHeight,
-        behavior: "smooth",
-      });
+    try {
+      const data = await sendChatMessage(cleanPrompt);
+      if (data?.answer) {
+        const botText = data.answer;
+        setMessages((prev) => [...prev, { sender: "bot", text: botText }]);
+      } else {
+        setError("El backend no envió ninguna respuesta.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("No pude conectarme con el bot. Intenta otra vez.");
+    } finally {
+      setIsBotTyping(false);
     }
-
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "bot",
-          text: "Gracias por tu mensaje 😊 pronto te responderé con la información que necesitas.",
-        },
-      ]);
-    }, 800);
   };
 
 
@@ -162,42 +189,17 @@ function Home() {
       return;
     }
     // Agregar el apoyo como mensaje del usuario
-    const nuevoMensaje: Message = { sender: "user", text: nombre };
-    setMessages((prev) => [...prev, nuevoMensaje]);
-    // Limpiar búsqueda y cerrar panel después de enviar
+    handleAIResponse(nombre);
     setBusqueda("");
     setShowApoyos(false);
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "bot",
-          text: `Aquí tienes información sobre "${nombre}". ¿Te gustaría saber más detalles o preguntar por otro apoyo?`,
-        },
-      ]);
-    }, 800);
   };
 
   const handleSelectHistoryMessage = (text: string) => {
-    // Agregar el mensaje del historial al chat como si el usuario lo hubiera escrito
-    const nuevoMensaje: Message = { sender: "user", text };
-    setMessages((prev) => [...prev, nuevoMensaje]);
-
-    // Simular respuesta del bot
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "bot",
-          text: "He encontrado la información sobre eso. ¿Necesitas más detalles?",
-        },
-      ]);
-    }, 800);
+    handleAIResponse(text);
   };
 
   return (
     <main className="home">
-
       {/* === Chat Section === */}
       <section className="chat-section">
         <div className="chat-app">
@@ -208,10 +210,26 @@ function Home() {
                 alt="EnlaceBot"
                 className="chat-avatar"
               />
+
               <div className="chat-info">
                 <h3>EnlaceBot</h3>
                 <span className="status">Disponible para ayudarte</span>
               </div>
+            </div>
+
+            <div className="HelperLink">
+              <button
+                className="Intruccions"
+                type="button"
+                onClick={() => {
+                  const guiaSection = document.querySelector('.guia-uso');
+                  if (guiaSection) {
+                    guiaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }}
+              >
+                ¿Cómo usar Enlace Qroo?
+              </button>
             </div>
 
 
@@ -230,7 +248,7 @@ function Home() {
               onClick={toggleApoyos}
               aria-label="Alternar panel de apoyos"
             >
-              📑 Apoyos {showApoyos ? "▲" : "▼"}
+              📑 Apoyos {showApoyos ? <FaChevronUp className="show-list" /> : <FaChevronDown className="show-list" />}
             </button>
 
             <div className={`apoyos-panel ${showApoyos ? "open" : ""}`} ref={apoyosPanelRef}>
@@ -304,6 +322,12 @@ function Home() {
                 <p className="bubble">{msg.text}</p>
               </div>
             ))}
+            {isBotTyping && (
+              <div className="message bot">
+                <img src={Enlacebot} alt="Bot" className="msg-avatar" />
+                <p className="bubble">EnlaceBot está respondiendo…</p>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
 
@@ -326,13 +350,27 @@ function Home() {
             />
             <button
               type="button"
+              className="send-btnAudio"
+              onClick={handleSend}
+              aria-label="Enviar audio"
+            >
+              <FaMicrophone />
+            </button>
+            <button
+              type="button"
               className="send-btn"
               onClick={handleSend}
               aria-label="Enviar mensaje"
             >
-              ➤
+              <RiSendPlaneFill />
             </button>
           </div>
+
+          {error && (
+            <p className="chat-error" role="alert" style={{ color: "#b3261e", margin: "0.5rem 1rem" }}>
+              {error}
+            </p>
+          )}
 
 
         </div>
@@ -363,85 +401,100 @@ function Home() {
 
       <GuiaEnlaceQroo />
 
+      {isVisible && (
+        <button
+          type="button"
+          className="scroll-top-btn"
+          onClick={scrollToTop}
+          aria-label="Volver al inicio"
+        >
+          <FaArrowUp />
+        </button>
+      )}
+
     </main>
   );
 }
+
 
 // === Guía de uso de Enlace Qroo ===
 function GuiaEnlaceQroo() {
   return (
     <section className="guia-uso">
-      <h3 className="guia-titulo"> Guía para usar Enlace Qroo</h3>
+      <h3 className="guia-titulo"> 🤖 Guía para usar Enlace Qroo</h3>
       <p className="guia-intro">
         Tu espacio para encontrar apoyos, becas y programas del gobierno fácilmente.
       </p>
 
       <div className="guia-pasos">
         <div className="guia-card">
-          <h4>1. Cómo empezar</h4>
+          <h4>💬 1. Cómo empezar a usar EnlaceBot</h4>
           <p>
-            Escribe tu pregunta en el chat, por ejemplo:
-            <br />• “Apoyos para madres solteras”
-            <br />• “¿Cómo solicitar la beca Benito Juárez?”
-            <br />• “Ayuda para adultos mayores”
+             Escribe tu pregunta en el chat, por ejemplo:
+            <br /> 👩‍👧 “Apoyos para madres solteras”
+            <br /> 📚 “¿Cómo solicitar la beca Benito Juárez?”
+            <br /> 👴 “Ayuda para adultos mayores”
           </p>
-          <p>Presiona el botón <strong>➤ Enviar</strong> o la tecla <strong>Enter</strong>.</p>
+          <p>Presiona el botón <strong> <RiSendPlaneFill /> Enviar</strong> o la tecla <strong>Enter</strong>.</p>
         </div>
 
         <div className="guia-card">
-          <h4>2. Usa el botón de Apoyos</h4>
+          <h4>📋 2. Usa el botón de Apoyos</h4>
           <p>
             En la parte superior del chat verás el botón <strong>“Apoyos”</strong>.
-            <br />Haz clic para ver una lista de apoyos disponibles.
-            <br />Selecciona el que te interese y envíalo al chat con un solo clic.
+            <br />✅ Haz clic para ver una lista de apoyos disponibles.
+            <br />✅ Selecciona el que te interese 
+            <br />✅ Envíalo al chat con un solo clic.
           </p>
         </div>
 
         <div className="guia-card">
-          <h4>3. Buscar apoyos específicos</h4>
+          <h4 className = "Titulo">3. Buscar apoyos específicos</h4>
           <p>
             Escribe palabras simples como:
-            <br />“Beca”, “Adultos mayores”, “Campo”, “Empleo” o “Salud”.
-            <br />El chatbot te mostrará los programas relacionados.
+            <br />📖 “Beca” | 👴👵 “Adultos mayores” | 🌾 “Campo” | 💼 “Empleo” | 🏥 “Salud”.
+            <br />El chatbot 🤖 te mostrará los programas relacionados.
           </p>
         </div>
 
         <div className="guia-card">
-          <h4>4. Consejos para una mejor experiencia</h4>
-          <ul>
-            <li> No te preocupes por escribir perfecto, el bot te entiende.</li>
-            <li> Si no entiendes algo, escribe “Explícalo más fácil”.</li>
-            <li> No es obligatorio registrarse.</li>
-          </ul>
-        </div>
-
-        <div className="guia-card">
-          <h4>5. Seguridad y confianza</h4>
+          <h4>✨ 4. Consejos para una mejor experiencia</h4>
           <p>
-            Enlace Qroo no solicita datos personales.
-            <br />Solo ofrece información pública y verificada de fuentes oficiales.
+            💡 No te preocupes por escribir perfecto, el bot te entiende.
+            <br />🗣️ Si no entiendes algo, escribe “Explícalo más fácil”.
+            <br />🚫 No es obligatorio registrarse.
           </p>
         </div>
 
         <div className="guia-card">
-          <h4>6. Usa el Historial de conversaciones</h4>
+          <h4>🔒 5. Seguridad y confianza</h4>
+          <p>
+            🛡️ Enlace Qroo no solicita datos personales.
+            <br />✅ Solo ofrece información pública y verificada de fuentes oficiales.
+          </p>
+        </div>
+
+        <div className="guia-card">
+          <h4>🕐 6. Usa el Historial de conversaciones</h4>
           <p>
             En la esquina superior derecha del chat encontrarás el botón del <strong>Historial</strong>.
             <br />Aquí puedes ver todas tus preguntas anteriores.
           </p>
           <p>
             <strong>Cómo usarlo:</strong>
-            <br />• Haz clic en el botón Historial
-            <br />• Busca una pregunta anterior escribiendo palabras clave
-            <br />• Selecciona la pregunta que deseas repetir
-            <br />• Se agregará automáticamente al chat para que el bot te responda de nuevo
+            <br /> Haz clic en el botón Historial
+            <br /> Busca una pregunta anterior escribiendo palabras clave
+            <br /> Selecciona la pregunta que deseas repetir
+            <br /> Se agregará automáticamente al chat para que el bot te responda de nuevo
           </p>
         </div>
 
         <div className="guia-card guia-final">
           <p className="guia-consejo">
-            <strong>Consejo del EnlaceBot:</strong> "No tengas miedo de preguntar.
+            <strong>🤖 Consejo del EnlaceBot:</strong> "No tengas miedo de preguntar.
             Estoy aquí para ayudarte a encontrar el apoyo que mereces."
+              <br />
+            ¿Listo para empezar? ¡Escribe tu primera pregunta! 👇
           </p>
         </div>
       </div>
