@@ -8,6 +8,7 @@ import madres_trabajadoras from "../assets/madres_trabajadoras.jpg";
 import sembrando_vida from "../assets/sembrando_vida.jpg";
 import ChatHistory from "../components/chathistory";
 import Enlacebot from "../assets/Enlacebot.jpg";
+import { formatMarkdown } from "./formatMarkdown";
 
 interface Message {
   sender: "bot" | "user";
@@ -84,7 +85,7 @@ function Home() {
         },
         body: JSON.stringify({ 
           message: message,
-          type: "text"  // Agregar el tipo que espera el backend
+          type: "text"
         }),
       });
 
@@ -124,11 +125,13 @@ function Home() {
       // CORREGIDO: Usar 'Message' en lugar de 'answer'
       if (data?.Message) {
         const botText = data.Message;
-        setMessages((prev) => [...prev, { sender: "bot", text: botText }]);
+        const formattedText = formatMarkdown(botText);
+        setMessages((prev) => [...prev, { sender: "bot", text: formattedText }]);
       } else if (data?.message) {
         // Por si acaso el backend usa 'message' en minúscula
         const botText = data.message;
-        setMessages((prev) => [...prev, { sender: "bot", text: botText }]);
+        const formattedText = formatMarkdown(botText);
+        setMessages((prev) => [...prev, { sender: "bot", text: formattedText }]);
       } else {
         console.error("Estructura de respuesta inesperada:", data);
         setError("El backend no envió ninguna respuesta válida.");
@@ -345,7 +348,10 @@ function Home() {
                     className="msg-avatar"
                   />
                 )}
-                <p className="bubble">{msg.text}</p>
+                <p 
+                  className="bubble"
+                  dangerouslySetInnerHTML={{ __html: msg.text }}
+                />
               </div>
             ))}
             {isBotTyping && (

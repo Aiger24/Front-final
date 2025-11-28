@@ -956,102 +956,129 @@ body>*:last-child {
   margin-bottom: 0;
 }
 
-/* ===== MARKDOWN RENDERER STYLES ===== */
-.markdown-content {
-  line-height: 1.5;
-  font-size: 14px;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-
-.markdown-line {
-  margin-bottom: 6px;
-}
-
-.markdown-line.with-icon {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.markdown-title {
-  font-weight: 600;
-  font-size: 15px;
-  margin: 12px 0 8px 0;
-  color: #611232;
-  background: linear-gradient(135deg, #611232, #8a2d52);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  padding-bottom: 4px;
-  border-bottom: 2px solid #f0e4e9;
-}
-
-.markdown-divider {
-  border: none;
-  border-top: 2px solid #e0c8d1;
-  margin: 16px 0;
-  border-radius: 2px;
-}
-
-.markdown-list-item {
-  margin-left: 16px;
-  margin-bottom: 6px;
-  position: relative;
-  padding-left: 8px;
-}
-
-.markdown-list-item::before {
-  content: "•";
-  position: absolute;
-  left: -12px;
-  color: #611232;
-  font-weight: bold;
-}
-
-/* Estilos para elementos específicos del markdown */
-.markdown-content strong {
+/* ===== ESTILOS PARA FORMATO MARKDOWN ===== */
+/* Estilos para elementos HTML generados por formatMarkdown */
+.bubble b,
+.bubble strong {
   font-weight: 700;
   color: #611232;
-  background: linear-gradient(135deg, #611232, #8a2d52);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
-/* Mejora la apariencia de los bubbles con markdown */
-.message.bot .bubble .markdown-content {
-  color: #333;
+.bubble i,
+.bubble em {
+  font-style: italic;
+  color: #555;
 }
 
-.message.bot .bubble .markdown-content strong {
-  color: #611232;
-}
-
-/* Ajustes para emojis y iconos */
-.markdown-line.with-icon {
-  font-size: 14px;
+.bubble u {
+  text-decoration: underline;
   color: #444;
 }
 
-.markdown-line.with-icon strong {
-  font-weight: 600;
+.bubble del {
+  text-decoration: line-through;
+  color: #888;
 }
 
-/* Mejora el espaciado general */
-.bubble .markdown-content {
-  padding: 2px 0;
+.bubble code {
+  background-color: #f4f4f4;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  color: #611232;
+  border: 1px solid #e0e0e0;
 }
 
-/* Ajustes responsivos */
+/* Mejora la apariencia de los bubbles con markdown */
+.message.bot .bubble b,
+.message.bot .bubble strong {
+  color: #611232;
+  background: linear-gradient(135deg, #611232, #8a2d52);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.message.bot .bubble code {
+  background-color: #f8f4f6;
+  color: #611232;
+  border-color: #e7c5d7;
+}
+
+.message.user .bubble b,
+.message.user .bubble strong {
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.message.user .bubble code {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Ajustes para mantener la legibilidad */
+.bubble {
+  line-height: 1.5;
+}
+
+.bubble > * {
+  margin-bottom: 4px;
+}
+
+.bubble > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Mejora el espaciado para elementos de markdown */
+.bubble b + br,
+.bubble strong + br,
+.bubble i + br,
+.bubble em + br {
+  display: none;
+}
+
+/* Ajustes responsivos para markdown */
 @media (max-width: 768px) {
-  .markdown-content {
-    font-size: 13px;
-  }
-  
   .bubble {
     max-width: 85%;
     padding: 0.7rem 0.9rem;
+    font-size: 13px;
   }
+  
+  .bubble code {
+    font-size: 0.85em;
+    padding: 1px 4px;
+  }
+}
+
+/* Estilos específicos para listas si el markdown las incluye */
+.bubble ul,
+.bubble ol {
+  margin-left: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.bubble li {
+  margin-bottom: 0.25rem;
+}
+
+/* Estilos para bloques de código si se usan */
+.bubble pre {
+  background-color: #f8f4f6;
+  border: 1px solid #e7c5d7;
+  border-radius: 6px;
+  padding: 0.8rem;
+  margin: 0.5rem 0;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.bubble pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #611232;
 }
