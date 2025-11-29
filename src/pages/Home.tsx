@@ -76,31 +76,6 @@ function Home() {
   }, [messages]);
 
 
-    // Función para enviar mensajes al backend - CORREGIDA
-  const sendChatMessage = async (message: string) => {
-    try {
-      const response = await fetch('http://localhost:5000/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          message: message,
-          type: "text"
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Error sending message:', error);
-      throw error;
-    }
-  };
   // 🔧 Mantener el panel de apoyos fijo junto al chatbot
 
   const handleSend = () => {
@@ -118,20 +93,15 @@ function Home() {
     setError(null);
     setMessages((prev) => [...prev, { sender: "user", text: cleanPrompt }]);
 
-        try {
+    try {
       const data = await sendChatMessage(cleanPrompt);
-      
+
       // DEBUG: Mostrar toda la respuesta del backend
       console.log("Respuesta completa del backend:", data);
-      
-      // CORREGIDO: Usar 'Message' en lugar de 'answer'
-      if (data?.Message) {
-        const botText = data.Message;
-        const formattedText = formatMarkdown(botText);
-        setMessages((prev) => [...prev, { sender: "bot", text: formattedText }]);
-      } else if (data?.message) {
-        // Por si acaso el backend usa 'message' en minúscula
-        const botText = data.message;
+
+      // CORREGIDO: Usar 'answer' que es lo que retorna el backend
+      if (data?.answer) {
+        const botText = data.answer;
         const formattedText = formatMarkdown(botText);
         setMessages((prev) => [...prev, { sender: "bot", text: formattedText }]);
       } else {
@@ -230,6 +200,15 @@ function Home() {
   };
 
   const handleSelectHistoryMessage = (text: string) => {
+    // Validar si el mensaje ya existe en la conversación actual
+    const messageExists = messages.some((m) => m.sender === "user" && m.text === text);
+    if (messageExists) {
+      // Si el mensaje ya existe, no hacer nada
+      console.log("Este mensaje ya está en la conversación");
+      return;
+    }
+
+    // Si es un mensaje nuevo, enviar
     handleAIResponse(text);
   };
 
@@ -282,7 +261,7 @@ function Home() {
               onClick={toggleApoyos}
               aria-label="Alternar panel de apoyos"
             >
-              📑 Apoyos {showApoyos ? <FaChevronUp className="show-list" /> : <FaChevronDown className="show-list" />}
+              📑 Visualizar Apoyos {showApoyos ? <FaChevronUp className="show-list" /> : <FaChevronDown className="show-list" />}
             </button>
 
             <div className={`apoyos-panel ${showApoyos ? "open" : ""}`} ref={apoyosPanelRef}>
@@ -353,7 +332,7 @@ function Home() {
                     className="msg-avatar"
                   />
                 )}
-                <p 
+                <p
                   className="bubble"
                   dangerouslySetInnerHTML={{ __html: msg.text }}
                 />
@@ -412,6 +391,13 @@ function Home() {
         <h3 ref={subtituloRef} className="main-subtitle">
           Apoyos más solicitados
         </h3>
+        {tarjetaSeleccionada !== null && (
+          <div
+            className="card-overlay"
+            onClick={() => setTarjetaSeleccionada(null)}
+            aria-label="Cerrar card"
+          />
+        )}
         <div className="info-cards">
           {apoyos.map((apoyo, index) => (
             <ApoyoCard
@@ -421,9 +407,7 @@ function Home() {
               oculto={tarjetaSeleccionada !== null && tarjetaSeleccionada !== index}
               onExpand={() => setTarjetaSeleccionada(index)}
               onClose={() => setTarjetaSeleccionada(null)}
-              subtituloRef={subtituloRef}
               onPreguntar={handleEnviarApoyo}
-              messagesEndRef={messagesEndRef}
             />
           ))}
         </div>
@@ -458,7 +442,7 @@ function GuiaEnlaceQroo() {
         <div className="guia-card">
           <h4>💬 1. Cómo empezar a usar EnlaceBot</h4>
           <p>
-             Escribe tu pregunta en el chat, por ejemplo:
+            Escribe tu pregunta en el chat, por ejemplo:
             <br /> 👩‍👧 “Apoyos para madres solteras”
             <br /> 📚 “¿Cómo solicitar la beca Benito Juárez?”
             <br /> 👴 “Ayuda para adultos mayores”
@@ -471,13 +455,13 @@ function GuiaEnlaceQroo() {
           <p>
             En la parte superior del chat verás el botón <strong>“Apoyos”</strong>.
             <br />✅ Haz clic para ver una lista de apoyos disponibles.
-            <br />✅ Selecciona el que te interese 
+            <br />✅ Selecciona el que te interese
             <br />✅ Envíalo al chat con un solo clic.
           </p>
         </div>
 
         <div className="guia-card">
-          <h4 className = "Titulo">3. Buscar apoyos específicos</h4>
+          <h4 className="Titulo">3. Buscar apoyos específicos</h4>
           <p>
             Escribe palabras simples como:
             <br />📖 “Beca” | 👴👵 “Adultos mayores” | 🌾 “Campo” | 💼 “Empleo” | 🏥 “Salud”.
@@ -521,7 +505,7 @@ function GuiaEnlaceQroo() {
           <p className="guia-consejo">
             <strong>🤖 Consejo del EnlaceBot:</strong> "No tengas miedo de preguntar.
             Estoy aquí para ayudarte a encontrar el apoyo que mereces."
-              <br />
+            <br />
             ¿Listo para empezar? ¡Escribe tu primera pregunta! 👇
           </p>
         </div>
@@ -536,68 +520,49 @@ interface ApoyoCardProps {
   oculto: boolean;
   onExpand: () => void;
   onClose: () => void;
-  subtituloRef: React.RefObject<HTMLHeadingElement>;
   onPreguntar?: (titulo: string) => void;
-  messagesEndRef?: React.RefObject<HTMLDivElement>;
 }
 
-function ApoyoCard({ apoyo, activo, oculto, onExpand, onClose, subtituloRef, onPreguntar, messagesEndRef }: ApoyoCardProps) {
+function ApoyoCard({ apoyo, activo, oculto, onExpand, onClose, onPreguntar }: ApoyoCardProps) {
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const [volviendo, setVolviendo] = useState(false);
 
   useEffect(() => {
-    if (activo && cardRef.current && subtituloRef.current) {
-      // Posición absoluta de la card dentro del documento
-      const cardHeight = cardRef.current.offsetHeight;
-
-      // Posición absoluta del subtítulo dentro del documento
-      const subtituloBottom = subtituloRef.current.offsetTop + subtituloRef.current.offsetHeight;
-
-      // Calcula scroll para que la card quede centrada debajo del subtítulo
-      const scrollY = subtituloBottom + cardHeight / 2 - window.innerHeight / 2;
-
-      window.scrollTo({
-        top: scrollY,
-        behavior: "smooth",
-      });
+    if (activo) {
+      // Agregar clase al body para desabilitar scroll
+      document.body.classList.add('card-expanded');
+    } else {
+      // Remover clase al body para habilitar scroll
+      document.body.classList.remove('card-expanded');
     }
+
+    return () => {
+      document.body.classList.remove('card-expanded');
+    };
   }, [activo]);
 
   const handleClose = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setVolviendo(true);
-    setTimeout(() => {
-      setVolviendo(false);
-      onClose();
-    }, 500); // coincide con duración de animación CSS
+    onClose();
   };
 
   const handlePreguntar = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setVolviendo(true);
-    setTimeout(() => {
-      setVolviendo(false);
-      onClose();
-      // Llamar al callback para enviar al chat
-      if (onPreguntar) {
-        onPreguntar(apoyo.titulo);
-      }
-      // Scroll hacia el chat
-      setTimeout(() => {
-        if (messagesEndRef?.current) {
-          const chatContainer = messagesEndRef.current.parentElement;
-          if (chatContainer) {
-            chatContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        } else {
-          // Fallback si no hay referencia
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          });
-        }
-      }, 100);
-    }, 500);
+    // Enviar mensaje al chat
+    if (onPreguntar) {
+      onPreguntar(apoyo.titulo);
+    }
+    // Cerrar card primero
+    onClose();
+    // Hacer scroll al inicio con múltiples métodos y delays
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    setTimeout(scrollToTop, 50);
+    setTimeout(scrollToTop, 100);
+    setTimeout(scrollToTop, 150);
   };
 
   return (
@@ -605,8 +570,7 @@ function ApoyoCard({ apoyo, activo, oculto, onExpand, onClose, subtituloRef, onP
       ref={cardRef}
       className={`info-card 
         ${activo ? "expandido" : ""} 
-        ${oculto ? "oculto" : ""} 
-        ${volviendo ? "volviendo" : ""}`}
+        ${oculto ? "oculto" : ""}`}
       onClick={!activo ? onExpand : undefined}
     >
       <img src={apoyo.img} alt={apoyo.titulo} />
