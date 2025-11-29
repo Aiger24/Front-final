@@ -7,9 +7,39 @@ import { IoEye, IoEyeOff } from "react-icons/io5";
 
 
 const RegisterUsers: React.FC = () => {
+    const [userName, setUserName] = useState("");
+    const [emailAddress, setEmailAddress] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const navigate = useNavigate();
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const payload = { userName, emailAddress, password, confirmPassword };
+
+        try {
+            const res = await fetch("https://localhost:7112/api/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("Usuario registrado correctamente ✅");
+                navigate("/login");
+            } else {
+                alert(data.message || "Error al registrar.");
+            }
+        } catch (err) {
+            console.error("Error de conexión:", err);
+            alert("No se pudo conectar con el servidor.");
+        }
+    };
 
 
     return (
@@ -43,7 +73,7 @@ const RegisterUsers: React.FC = () => {
                     </div>
 
 
-                    <form id="registerForm" className="register-form" noValidate>
+                    <form id="registerForm" className="register-form" onSubmit={handleSubmit} noValidate>
                         <div className="form-row"> {/* Agrupa los campos lado a lado */}
                             <div className="form-group">
                                 <label htmlFor="nombre">Nombre de usuario</label>
@@ -53,6 +83,8 @@ const RegisterUsers: React.FC = () => {
                                     name="nombre"
                                     placeholder="Ingresa tu nombre"
                                     autoComplete="given-name"
+                                    value={userName}
+                                    onChange={(e) => setUserName(e.target.value)}
                                     required
                                 >
                                 </input>
@@ -67,6 +99,8 @@ const RegisterUsers: React.FC = () => {
                                 name="email"
                                 placeholder="ejemplo@correo.com"
                                 autoComplete="email"
+                                value={emailAddress}
+                                onChange={(e) => setEmailAddress(e.target.value)}
                                 required
                             >
                             </input>
@@ -81,6 +115,8 @@ const RegisterUsers: React.FC = () => {
                                     name="password"
                                     placeholder="Mínimo 8 caracteres"
                                     autoComplete="new-password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
                                 <button
@@ -104,6 +140,8 @@ const RegisterUsers: React.FC = () => {
                                     name="confirmPassword"
                                     placeholder="Mínimo 8 caracteres"
                                     autoComplete="new-password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
                                     required
                                 />
 
