@@ -17,15 +17,6 @@ body {
 }
 
 /* Scrollbars ocultos */
-*::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-}
-
-* {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
 
 .app,
 .main-container,
@@ -104,8 +95,8 @@ body {
 .chat-app {
   background-color: #611232;
   width: 100%;
-  max-width: 900px;
-  height: 500px;
+  max-width: 1250px;
+  height: 670px;
   border-radius: 15px;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
   display: flex;
@@ -119,7 +110,7 @@ body {
   color: #fff;
   padding: 1.2rem 1.8rem;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -145,12 +136,12 @@ body {
 }
 
 .chat-info h3 {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   font-weight: 600;
 }
 
 .chat-info .status {
-  font-size: 0.85rem;
+  font-size: 1rem;
   opacity: 0.9;
 }
 
@@ -268,7 +259,7 @@ body {
   background-color: rgba(255, 255, 255, 0.25);
   transform: scale(1.03);
 }
-  
+
 
 /* === Input de mensaje === */
 .chat-input-area {
@@ -464,7 +455,8 @@ body {
   background-color: #611232;
   color: #fff;
   border: none;
-  padding: 0.5rem 1.5rem;
+  font-size: 1.1rem;
+  padding: 0.6rem 1.8rem;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
@@ -490,7 +482,7 @@ body {
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
-  margin-top: 0.5rem;
+  margin-top: 0.3rem;
   transition: max-height 0.4s ease, opacity 0.3s ease;
   opacity: 0;
 }
@@ -623,6 +615,27 @@ body {
 .send-btnAudio svg {
   width: 24px;
   height: 24px;
+}
+
+.send-btnAudio.recording {
+  animation: pulse 1.5s infinite;
+  background-color: #fff;
+  color: #e74c3c;
+  border: 2px solid #e74c3c;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+  }
 }
 
 /* ===== SECCIÓN DE APOYOS ===== */
@@ -1032,19 +1045,19 @@ body>*:last-child {
   line-height: 1.5;
 }
 
-.bubble > * {
+.bubble>* {
   margin-bottom: 4px;
 }
 
-.bubble > *:last-child {
+.bubble>*:last-child {
   margin-bottom: 0;
 }
 
 /* Mejora el espaciado para elementos de markdown */
-.bubble b + br,
-.bubble strong + br,
-.bubble i + br,
-.bubble em + br {
+.bubble b+br,
+.bubble strong+br,
+.bubble i+br,
+.bubble em+br {
   display: none;
 }
 
@@ -1055,7 +1068,7 @@ body>*:last-child {
     padding: 0.7rem 0.9rem;
     font-size: 13px;
   }
-  
+
   .bubble code {
     font-size: 0.85em;
     padding: 1px 4px;
@@ -1090,4 +1103,51 @@ body>*:last-child {
   border: none;
   padding: 0;
   color: #611232;
+}
+
+.guia-card.video-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.left-panelvideo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.right-panelvideo {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Video-tuto {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.right-panelvideoapoyos {
+  flex: 1;
+  display: flex;
+  justify-content: left;
+  align-items: left;
+}
+
+@media (max-width: 768px) {
+  .guia-card.video-layout {
+    flex-direction: column;
+  }
+  
+  .Video-tuto {
+    width: 100%;
+  }
 }

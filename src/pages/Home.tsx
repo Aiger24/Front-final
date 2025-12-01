@@ -8,9 +8,8 @@ import madres_trabajadoras from "../assets/madres_trabajadoras.jpg";
 import sembrando_vida from "../assets/sembrando_vida.jpg";
 import ChatHistory from "../components/chathistory";
 import Enlacebot from "../assets/Enlacebot.jpg";
-import { sendChatMessage } from "../services/chatClient";
 import { formatMarkdown } from "./formatMarkdown";
-
+import ReactPlayer from "react-player";
 interface Message {
   sender: "bot" | "user";
   text: string;
@@ -34,11 +33,56 @@ function Home() {
   const [apoyoError, setApoyoError] = useState<string | null>(null);
   const [isBotTyping, setIsBotTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const textBeforeRecording = useRef("");
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const subtituloRef = useRef<HTMLHeadingElement | null>(null);
   const apoyosPanelRef = useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = useState(true);
+
+  const handleMicClick = () => {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Tu navegador no soporta reconocimiento de voz.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "es-ES";
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    textBeforeRecording.current = inputValue;
+
+    recognition.onresult = (event: any) => {
+      let currentTranscript = "";
+      for (let i = 0; i < event.results.length; i++) {
+        currentTranscript += event.results[i][0].transcript;
+      }
+      setInputValue(textBeforeRecording.current + (textBeforeRecording.current ? " " : "") + currentTranscript);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error", event.error);
+      setIsRecording(false);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsRecording(true);
+  };
 
   // 🔧 Botón de scroll to top
   const scrollToTop = () => {
@@ -64,19 +108,15 @@ function Home() {
     const chatContainer = messagesEndRef.current?.parentElement;
     if (!chatContainer) return;
 
-    const shouldScroll =
-      chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 150;
-
-    if (shouldScroll) {
-      chatContainer.scrollTo({
-        top: chatContainer.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  }, [messages]);
+    // Siempre hacer scroll al fondo para mostrar la respuesta más reciente 
+    chatContainer.scrollTo({
+      top: chatContainer.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [messages, isBotTyping]);
 
 
-    // Función para enviar mensajes al backend - CORREGIDA
+  // Función para enviar mensajes al backend - CORREGIDA
   const sendChatMessage = async (message: string) => {
     try {
       const response = await fetch('http://localhost:5000/api/chat', {
@@ -84,7 +124,7 @@ function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           message: message,
           type: "text"
         }),
@@ -101,9 +141,13 @@ function Home() {
       throw error;
     }
   };
-  // 🔧 Mantener el panel de apoyos fijo junto al chatbot
+  // Mantener el panel de apoyos fijo junto al chatbot
 
   const handleSend = () => {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+    }
     const prompt = inputValue.trim();
     if (!prompt) return;
     setInputValue("");
@@ -118,12 +162,12 @@ function Home() {
     setError(null);
     setMessages((prev) => [...prev, { sender: "user", text: cleanPrompt }]);
 
-        try {
+    try {
       const data = await sendChatMessage(cleanPrompt);
-      
+
       // DEBUG: Mostrar toda la respuesta del backend
       console.log("Respuesta completa del backend:", data);
-      
+
       // CORREGIDO: Usar 'Message' en lugar de 'answer'
       if (data?.Message) {
         const botText = data.Message;
@@ -353,7 +397,7 @@ function Home() {
                     className="msg-avatar"
                   />
                 )}
-                <p 
+                <p
                   className="bubble"
                   dangerouslySetInnerHTML={{ __html: msg.text }}
                 />
@@ -383,9 +427,9 @@ function Home() {
             />
             <button
               type="button"
-              className="send-btnAudio"
-              onClick={handleSend}
-              aria-label="Enviar audio"
+              className={`send-btnAudio ${isRecording ? "recording" : ""}`}
+              onClick={handleMicClick}
+              aria-label={isRecording ? "Detener grabación" : "Iniciar grabación"}
             >
               <FaMicrophone />
             </button>
@@ -455,47 +499,64 @@ function GuiaEnlaceQroo() {
       </p>
 
       <div className="guia-pasos">
-        <div className="guia-card">
-          <h4>💬 1. Cómo empezar a usar EnlaceBot</h4>
-          <p>
-             Escribe tu pregunta en el chat, por ejemplo:
-            <br /> 👩‍👧 “Apoyos para madres solteras”
-            <br /> 📚 “¿Cómo solicitar la beca Benito Juárez?”
-            <br /> 👴 “Ayuda para adultos mayores”
-          </p>
-          <p>Presiona el botón <strong> <RiSendPlaneFill /> Enviar</strong> o la tecla <strong>Enter</strong>.</p>
+        <div className="guia-card video-layout">
+          <div className="left-panelvideo">
+            <h4>💬 1. Cómo empezar a usar EnlaceBot</h4>
+            <p>
+              Escribe tu pregunta en el chat, por ejemplo:
+              <br /> 👩‍👧 “Apoyos para madres solteras”
+              <br /> 📚 “¿Cómo solicitar la beca Benito Juárez?”
+              <br /> 👴 “Ayuda para adultos mayores”
+            </p>
+            <p>Presiona el botón <strong> <RiSendPlaneFill /> Enviar</strong> o la tecla <strong>Enter</strong>.</p>
+          </div>
+
+          <div className="right-panelvideo">
+            <div className="Video-tuto">
+              {/* @ts-ignore */}
+              <ReactPlayer
+                url='https://youtu.be/okAOba-03bI'
+                controls={true}
+                width="100%"
+                height="100%"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="guia-card video-layout">
+          <div className="left-panelvideo">
+            <h4>📋 2. Usa el botón de Apoyos</h4>
+            <p>
+              En la parte superior del chat verás el botón <strong>“Apoyos”</strong>.
+              <br />✅ Haz clic para ver una lista de apoyos disponibles.
+              <br />✅ Selecciona el que te interese
+              <br />✅ Envíalo al chat con un solo clic.
+            </p>
+          </div>
+          <div className="right-panelvideoapoyos">
+            <div className="Video-tuto">
+              <ReactPlayer
+                url='https://youtu.be/3cWQXrQ3668'
+                controls={true}
+                width="100%"
+                height="100%"
+              />
+            </div>
+          </div>
         </div>
 
         <div className="guia-card">
-          <h4>📋 2. Usa el botón de Apoyos</h4>
-          <p>
-            En la parte superior del chat verás el botón <strong>“Apoyos”</strong>.
-            <br />✅ Haz clic para ver una lista de apoyos disponibles.
-            <br />✅ Selecciona el que te interese 
-            <br />✅ Envíalo al chat con un solo clic.
-          </p>
+            <h4>✨ 3. Consejos para una mejor experiencia</h4>
+            <p>
+              💡 No te preocupes por escribir perfecto, el bot te entiende.
+              <br />🗣️ Si no entiendes algo, escribe “Explícalo más fácil”.
+              <br />🚫 No es obligatorio registrarse.
+            </p>
         </div>
 
         <div className="guia-card">
-          <h4 className = "Titulo">3. Buscar apoyos específicos</h4>
-          <p>
-            Escribe palabras simples como:
-            <br />📖 “Beca” | 👴👵 “Adultos mayores” | 🌾 “Campo” | 💼 “Empleo” | 🏥 “Salud”.
-            <br />El chatbot 🤖 te mostrará los programas relacionados.
-          </p>
-        </div>
-
-        <div className="guia-card">
-          <h4>✨ 4. Consejos para una mejor experiencia</h4>
-          <p>
-            💡 No te preocupes por escribir perfecto, el bot te entiende.
-            <br />🗣️ Si no entiendes algo, escribe “Explícalo más fácil”.
-            <br />🚫 No es obligatorio registrarse.
-          </p>
-        </div>
-
-        <div className="guia-card">
-          <h4>🔒 5. Seguridad y confianza</h4>
+          <h4>🔒 4. Seguridad y confianza</h4>
           <p>
             🛡️ Enlace Qroo no solicita datos personales.
             <br />✅ Solo ofrece información pública y verificada de fuentes oficiales.
@@ -503,7 +564,7 @@ function GuiaEnlaceQroo() {
         </div>
 
         <div className="guia-card">
-          <h4>🕐 6. Usa el Historial de conversaciones</h4>
+          <h4>🕐 5. Usa el Historial de conversaciones</h4>
           <p>
             En la esquina superior derecha del chat encontrarás el botón del <strong>Historial</strong>.
             <br />Aquí puedes ver todas tus preguntas anteriores.
@@ -521,7 +582,7 @@ function GuiaEnlaceQroo() {
           <p className="guia-consejo">
             <strong>🤖 Consejo del EnlaceBot:</strong> "No tengas miedo de preguntar.
             Estoy aquí para ayudarte a encontrar el apoyo que mereces."
-              <br />
+            <br />
             ¿Listo para empezar? ¡Escribe tu primera pregunta! 👇
           </p>
         </div>
