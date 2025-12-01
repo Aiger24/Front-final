@@ -10,6 +10,9 @@ import ChatHistory from "../components/chathistory";
 import Enlacebot from "../assets/Enlacebot.jpg";
 import { formatMarkdown } from "./formatMarkdown";
 import ReactPlayer from "react-player";
+import Howtosend from "../media/1-1.mp4";
+import Howtousechat from "../media/1130 (2)(2)-1.mp4";
+
 interface Message {
   sender: "bot" | "user";
   text: string;
@@ -38,9 +41,17 @@ function Home() {
   const textBeforeRecording = useRef("");
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const subtituloRef = useRef<HTMLHeadingElement | null>(null);
   const apoyosPanelRef = useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = useState(true);
+
+  const handleScrollToChat = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 500);
+  };
 
   const handleMicClick = () => {
     if (isRecording) {
@@ -274,6 +285,15 @@ function Home() {
   };
 
   const handleSelectHistoryMessage = (text: string) => {
+    // Validar si el mensaje ya existe en la conversación actual
+    const messageExists = messages.some((m) => m.sender === "user" && m.text === text);
+    if (messageExists) {
+      // Si el mensaje ya existe, no hacer nada
+      console.log("Este mensaje ya está en la conversación");
+      return;
+    }
+
+    // Si es un mensaje nuevo, enviar
     handleAIResponse(text);
   };
 
@@ -326,7 +346,7 @@ function Home() {
               onClick={toggleApoyos}
               aria-label="Alternar panel de apoyos"
             >
-              📑 Apoyos {showApoyos ? <FaChevronUp className="show-list" /> : <FaChevronDown className="show-list" />}
+              📑 Visualizar Apoyos {showApoyos ? <FaChevronUp className="show-list" /> : <FaChevronDown className="show-list" />}
             </button>
 
             <div className={`apoyos-panel ${showApoyos ? "open" : ""}`} ref={apoyosPanelRef}>
@@ -414,6 +434,7 @@ function Home() {
 
           <div className="chat-input-area">
             <input
+              ref={inputRef}
               type="text"
               placeholder="Escribe tu mensaje..."
               value={inputValue}
@@ -456,6 +477,13 @@ function Home() {
         <h3 ref={subtituloRef} className="main-subtitle">
           Apoyos más solicitados
         </h3>
+        {tarjetaSeleccionada !== null && (
+          <div
+            className="card-overlay"
+            onClick={() => setTarjetaSeleccionada(null)}
+            aria-label="Cerrar card"
+          />
+        )}
         <div className="info-cards">
           {apoyos.map((apoyo, index) => (
             <ApoyoCard
@@ -465,15 +493,13 @@ function Home() {
               oculto={tarjetaSeleccionada !== null && tarjetaSeleccionada !== index}
               onExpand={() => setTarjetaSeleccionada(index)}
               onClose={() => setTarjetaSeleccionada(null)}
-              subtituloRef={subtituloRef}
               onPreguntar={handleEnviarApoyo}
-              messagesEndRef={messagesEndRef}
             />
           ))}
         </div>
       </section>
 
-      <GuiaEnlaceQroo />
+      <GuiaEnlaceQroo onScrollToChat={handleScrollToChat} />
 
       {isVisible && (
         <button
@@ -490,7 +516,12 @@ function Home() {
 }
 
 // === Guía de uso de Enlace Qroo ===
-function GuiaEnlaceQroo() {
+interface GuiaEnlaceQrooProps {
+  onScrollToChat: () => void;
+}
+
+// define guia enlace qroo como un componente desde home, control remotto que indicia que haga scroll al chat
+function GuiaEnlaceQroo({ onScrollToChat }: GuiaEnlaceQrooProps) {
   return (
     <section className="guia-uso">
       <h3 className="guia-titulo"> 🤖 Guía para usar Enlace Qroo</h3>
@@ -508,17 +539,18 @@ function GuiaEnlaceQroo() {
               <br /> 📚 “¿Cómo solicitar la beca Benito Juárez?”
               <br /> 👴 “Ayuda para adultos mayores”
             </p>
-            <p>Presiona el botón <strong> <RiSendPlaneFill /> Enviar</strong> o la tecla <strong>Enter</strong>.</p>
+            <p>Presiona el botón <strong><RiSendPlaneFill /> Enviar</strong> o la tecla <strong>Enter</strong>.</p>
           </div>
 
           <div className="right-panelvideo">
             <div className="Video-tuto">
-              {/* @ts-ignore */}
-              <ReactPlayer
-                url='https://youtu.be/okAOba-03bI'
-                controls={true}
-                width="100%"
-                height="100%"
+              <video
+                src={Howtosend}
+                controls
+                autoPlay
+                
+                loop
+                style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
               />
             </div>
           </div>
@@ -528,7 +560,7 @@ function GuiaEnlaceQroo() {
           <div className="left-panelvideo">
             <h4>📋 2. Usa el botón de Apoyos</h4>
             <p>
-              En la parte superior del chat verás el botón <strong>“Apoyos”</strong>.
+              En la parte superior del chat verás el botón <strong>“📋 Visualizar Apoyos”</strong>.
               <br />✅ Haz clic para ver una lista de apoyos disponibles.
               <br />✅ Selecciona el que te interese
               <br />✅ Envíalo al chat con un solo clic.
@@ -536,11 +568,13 @@ function GuiaEnlaceQroo() {
           </div>
           <div className="right-panelvideoapoyos">
             <div className="Video-tuto">
-              <ReactPlayer
-                url='https://youtu.be/3cWQXrQ3668'
-                controls={true}
-                width="100%"
-                height="100%"
+              <video
+                src={Howtousechat}
+                controls
+                autoPlay
+                loop
+                muted
+                style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
               />
             </div>
           </div>
@@ -578,7 +612,12 @@ function GuiaEnlaceQroo() {
           </p>
         </div>
 
-        <div className="guia-card guia-final">
+        <div 
+        //indicaciones para que al presionar mande directo al chat
+          className="guia-card guia-final" 
+          onClick={onScrollToChat}
+          style={{ cursor: 'pointer' }}
+        >
           <p className="guia-consejo">
             <strong>🤖 Consejo del EnlaceBot:</strong> "No tengas miedo de preguntar.
             Estoy aquí para ayudarte a encontrar el apoyo que mereces."
@@ -597,68 +636,49 @@ interface ApoyoCardProps {
   oculto: boolean;
   onExpand: () => void;
   onClose: () => void;
-  subtituloRef: React.RefObject<HTMLHeadingElement>;
   onPreguntar?: (titulo: string) => void;
-  messagesEndRef?: React.RefObject<HTMLDivElement>;
 }
 
-function ApoyoCard({ apoyo, activo, oculto, onExpand, onClose, subtituloRef, onPreguntar, messagesEndRef }: ApoyoCardProps) {
+function ApoyoCard({ apoyo, activo, oculto, onExpand, onClose, onPreguntar }: ApoyoCardProps) {
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const [volviendo, setVolviendo] = useState(false);
 
   useEffect(() => {
-    if (activo && cardRef.current && subtituloRef.current) {
-      // Posición absoluta de la card dentro del documento
-      const cardHeight = cardRef.current.offsetHeight;
-
-      // Posición absoluta del subtítulo dentro del documento
-      const subtituloBottom = subtituloRef.current.offsetTop + subtituloRef.current.offsetHeight;
-
-      // Calcula scroll para que la card quede centrada debajo del subtítulo
-      const scrollY = subtituloBottom + cardHeight / 2 - window.innerHeight / 2;
-
-      window.scrollTo({
-        top: scrollY,
-        behavior: "smooth",
-      });
+    if (activo) {
+      // Agregar clase al body para desabilitar scroll
+      document.body.classList.add('card-expanded');
+    } else {
+      // Remover clase al body para habilitar scroll
+      document.body.classList.remove('card-expanded');
     }
+
+    return () => {
+      document.body.classList.remove('card-expanded');
+    };
   }, [activo]);
 
   const handleClose = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setVolviendo(true);
-    setTimeout(() => {
-      setVolviendo(false);
-      onClose();
-    }, 500); // coincide con duración de animación CSS
+    onClose();
   };
 
   const handlePreguntar = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setVolviendo(true);
-    setTimeout(() => {
-      setVolviendo(false);
-      onClose();
-      // Llamar al callback para enviar al chat
-      if (onPreguntar) {
-        onPreguntar(apoyo.titulo);
-      }
-      // Scroll hacia el chat
-      setTimeout(() => {
-        if (messagesEndRef?.current) {
-          const chatContainer = messagesEndRef.current.parentElement;
-          if (chatContainer) {
-            chatContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        } else {
-          // Fallback si no hay referencia
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          });
-        }
-      }, 100);
-    }, 500);
+    // Enviar mensaje al chat
+    if (onPreguntar) {
+      onPreguntar(apoyo.titulo);
+    }
+    // Cerrar card primero
+    onClose();
+    // Hacer scroll al inicio con múltiples métodos y delays
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    setTimeout(scrollToTop, 50);
+    setTimeout(scrollToTop, 100);
+    setTimeout(scrollToTop, 150);
   };
 
   return (
@@ -666,8 +686,7 @@ function ApoyoCard({ apoyo, activo, oculto, onExpand, onClose, subtituloRef, onP
       ref={cardRef}
       className={`info-card 
         ${activo ? "expandido" : ""} 
-        ${oculto ? "oculto" : ""} 
-        ${volviendo ? "volviendo" : ""}`}
+        ${oculto ? "oculto" : ""}`}
       onClick={!activo ? onExpand : undefined}
     >
       <img src={apoyo.img} alt={apoyo.titulo} />
