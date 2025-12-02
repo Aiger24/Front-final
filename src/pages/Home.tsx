@@ -546,7 +546,6 @@ function GuiaEnlaceQroo({ onScrollToChat }: GuiaEnlaceQrooProps) {
             <div className="Video-tuto">
               <video
                 src={Howtosend}
-                controls
                 autoPlay
                 muted
                 loop
@@ -570,7 +569,6 @@ function GuiaEnlaceQroo({ onScrollToChat }: GuiaEnlaceQrooProps) {
             <div className="Video-tuto">
               <video
                 src={Howtousechat}
-                controls
                 autoPlay
                 loop
                 muted
