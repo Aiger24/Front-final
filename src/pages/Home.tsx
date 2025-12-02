@@ -548,7 +548,7 @@ function GuiaEnlaceQroo({ onScrollToChat }: GuiaEnlaceQrooProps) {
                 src={Howtosend}
                 controls
                 autoPlay
-                
+                muted
                 loop
                 style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
               />
